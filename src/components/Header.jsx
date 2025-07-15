@@ -16,7 +16,7 @@ import {
   Stack
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import CheckIcon from '@mui/icons-material/Check';
+// import { ReactComponent as LogoIcon } from "../assets/lordtech.svg";
 
 function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -56,12 +56,12 @@ function Header() {
   );
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#3a3a3a', boxShadow: 'none', marginBottom: '70px' }}>
+    <AppBar position="fixed" sx={{ backgroundColor: '#3a3a3a', boxShadow: 'none', marginBottom: '70px' }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* Logo */}
         <Box display="flex" alignItems="center" gap={1}>
-          <CheckIcon />
-          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Invoice Simple</Typography>
+          <img src="../src/assets/lordtech.png" alt="Lordtechdatus-Logo" style={{ height: 32 }} />
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>InvoiceLord.com</Typography>
         </Box>
 
         {/* Desktop Navigation */}
