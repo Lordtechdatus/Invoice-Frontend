@@ -1,0 +1,16 @@
+@media print {
+    .MuiAppBar-root,
+    .MuiTabs-root,
+    .MuiButton-root,
+    .MuiDrawer-root,
+    .MuiSnackbar-root {
+      display: none !important;
+    }
+  
+    body {
+      margin: 0;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+  
