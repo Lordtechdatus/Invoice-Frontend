@@ -32,6 +32,8 @@ import { Add, Remove } from "@mui/icons-material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import "./index.css";
 import Header from "./Header";
+import InvoiceTable from "./Table";
+import { useNavigate } from 'react-router-dom';
 
 const currencyList = [
   { code: "INR", symbol: "₹", label: "Indian Rupee", flag: "🇮🇳" },
@@ -55,6 +57,7 @@ const colorThemes = [
 ];
 
 function InvoiceForm() {
+    const navigate = useNavigate();
     const sigPadRef = useRef(null);
     const [tab, setTab] = useState(0);
     const [showSignaturePad, setShowSignaturePad] = useState(false);
@@ -230,6 +233,7 @@ function InvoiceForm() {
     };
 
     const handleCloseInvoice = () => {
+        navigate("/");
         setSnackbar({ open: true, message: "Invoice closed.", severity: "info" });
       };
       
@@ -482,9 +486,11 @@ function InvoiceForm() {
                           </FormControl>
                         </Grid>
                       </Grid>
+
+                      <InvoiceTable />
       
                       {/* Table Headers */}
-                      <Grid container sx={{ borderBottom: "1px solid #ccc", pb: 1, justifyContent: "space-evenly" }}>
+                      {/* <Grid container sx={{ borderBottom: "1px solid #ccc", pb: 1, justifyContent: "space-evenly" }}>
                         <Grid item xs={5} sx={{ fontWeight: "bold" }}>
                           DESCRIPTION
                         </Grid>
@@ -501,10 +507,10 @@ function InvoiceForm() {
                           TAX
                         </Grid>
                         <Grid item xs={1} />
-                      </Grid>
+                      </Grid> */}
       
                       {/* Invoice items rows */}
-                      {items.map((item, index) => (
+                      {/* {items.map((item, index) => (
                         <Grid
                           container
                           spacing={1}
@@ -575,14 +581,14 @@ function InvoiceForm() {
                             </IconButton>
                           </Grid>
                         </Grid>
-                      ))}
+                      ))} */}
       
-                      <Box mt={1}>
+                      {/* <Box mt={1}>
                         <Button startIcon={<Add />} onClick={handleAddItem}>
                           Add Item
                         </Button>
-                      </Box>
-      
+                      </Box>*/}
+                      
                       {/* Totals */}
                       <Box mt={3} sx={{ textAlign: "right", pr: 2 }}>
                         <Typography>
@@ -752,7 +758,7 @@ function InvoiceForm() {
                         color={selectedColor}
                         onChangeComplete={(color) => setSelectedColor(color.hex)}
                         disableAlpha
-                        styles={{ default: { picker: { width: '25%' } } }}
+                        styles={{ default: { picker: { width: '250px', height: '250px' } } }}
                       />
                     )}
     
