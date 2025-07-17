@@ -22,9 +22,12 @@ const SignUp = () => {
       <Paper
         elevation={3}
         sx={{
-          width: "85%",
+          width: "70%",
           p: 4,
+          mt: 5,
+          border: '0.5px solid transparent',
           borderRadius: 3,
+          boxShadow: 8,
           bgcolor: "background.paper",
           textAlign: "center",
         }}
@@ -91,7 +94,7 @@ const SignUp = () => {
           </Button>
 
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Already have an account? <Button onClick={() => navigate("/SignIn")} color="blue" variant="text"
+            Already have an account?<Button onClick={() => navigate("/SignIn")} color="blue" variant="text"
             sx={{ textTransform: "none", color: "blue" }}>Log In</Button>
             </Typography>
         </Box>

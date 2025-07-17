@@ -21,6 +21,7 @@ const About = () => {
         elevation={8}
         sx={{
           p: { xs: 3, md: 6 },
+          mt: 8,
           borderRadius: 5,
           maxWidth: 700,
           width: 1,

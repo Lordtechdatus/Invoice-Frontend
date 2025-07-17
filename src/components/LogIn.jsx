@@ -21,9 +21,11 @@ const LogIn = () => {
       <Paper
         elevation={3}
         sx={{
-          width: "85%",
+          width: "70%",
           p: 4,
+          border: '0.5px solid transparent',
           borderRadius: 3,
+          boxShadow: 8,
           bgcolor: "background.paper",
           textAlign: "center",
         }}

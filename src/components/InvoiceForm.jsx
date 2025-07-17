@@ -319,7 +319,7 @@ function InvoiceForm() {
               label="Dark Mode"
             />
             </Box>
-          <Paper elevation={3} sx={{ p: 3 }}>
+          <Paper elevation={3} sx={{ p: 3, marginTop: 7, border: '1px solid transparent', boxShadow: 7 }}>
               {/* Responsive Tabs */}
               <Tabs
                 value={tab}
