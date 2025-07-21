@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import Home from "./components/Home";
 import InvoiceForm from "./components/InvoiceForm";
 import About from "./components/About";
+import Pricing from "./components/Pricing";
 import LogIn from "./components/LogIn";
 import SignUp from "./components/SignUp";
 import Pricing from "./components/Pricing";
