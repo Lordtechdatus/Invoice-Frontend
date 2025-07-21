@@ -19,7 +19,7 @@ const LogIn = () => {
   return (
     <Container maxWidth="sm" sx={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <Paper
-        elevation={3}
+        elevation={1}
         sx={{
           width: "70%",
           p: 4,
@@ -28,6 +28,7 @@ const LogIn = () => {
           boxShadow: 8,
           bgcolor: "background.paper",
           textAlign: "center",
+          mb: 10,
         }}
       >
         <Typography variant="h5" gutterBottom>

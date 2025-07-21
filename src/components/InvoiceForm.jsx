@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { ChromePicker } from 'react-color';
 import SignatureCanvas from 'react-signature-canvas';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   CssBaseline,
   Switch,
@@ -22,17 +24,18 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  Tooltip,
   IconButton,
   Divider,
   InputAdornment,
   Snackbar,
   Alert,
 } from "@mui/material";
-import { Add, Remove } from "@mui/icons-material";
+import { Add, Close } from "@mui/icons-material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import "./index.css";
-import Header from "./Header";
 import InvoiceTable from "./Table";
+import PreviewPage from "./Preview";
 import { useNavigate } from 'react-router-dom';
 
 const currencyList = [
@@ -59,7 +62,7 @@ const colorThemes = [
 function InvoiceForm() {
     const navigate = useNavigate();
     const sigPadRef = useRef(null);
-    const [tab, setTab] = useState(0);
+    const [tab, setTab] = useState(1);
     const [showSignaturePad, setShowSignaturePad] = useState(false);
     
     const [anchorEl, setAnchorEl] = useState(null);
@@ -146,6 +149,26 @@ function InvoiceForm() {
   
     // Snackbar state for notifications
     const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+
+    const previewRef = useRef();
+
+    const handleDownload = async () => {
+      const input = previewRef.current;
+
+      const canvas = await html2canvas(input, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pageWidth;
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${invoiceInfo.number || "invoice"}.pdf`);
+    };
   
     // Handlers for basic inputs
     const handleFromChange = (field) => (e) => setFrom((prev) => ({ ...prev, [field]: e.target.value }));
@@ -170,11 +193,12 @@ function InvoiceForm() {
         if (isEmpty) {
           alert("Please draw a signature before saving.");
           return;
+        } else {
+            const dataUrl = sigPadRef.current.getTrimmedCanvas().toDataURL('image/png');
+            setSignatureImage(dataUrl);
+            setShowSignaturePad(false);
+            return;
         }
-      
-        const dataUrl = sigPadRef.current.getTrimmedCanvas().toDataURL('image/png');
-        setSignatureImage(dataUrl);
-        setShowSignaturePad(false);
       } catch (err) {
         console.error("Error saving signature:", err);
       }
@@ -200,13 +224,13 @@ function InvoiceForm() {
         }
       };
 
-    const handleLogoClick = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
+    // const handleLogoClick = (event) => {
+    //   setAnchorEl(event.currentTarget);
+    // };
       
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
+    // const handleClose = () => {
+    //   setAnchorEl(null);
+    // };
       
     const handleDeleteLogo = () => {
       setLogoImage(null);
@@ -272,8 +296,22 @@ function InvoiceForm() {
       
   
     // Calculations
-    const subtotal = items.reduce((acc, item) => acc + item.rate * item.qty, 0);
-    const taxAmount = tax.type.toLowerCase() === "none" ? 0 : items.reduce((acc, item) => acc + (item.tax ? item.rate * item.qty * 0.1 : 0), 0);
+    const subtotal = items.reduce((acc, item) => acc + (item.rate * item.qty), 0);
+    const TAX_RATE = 0.18;
+
+    const taxAmount = tax.type.toLowerCase() === "none"
+      ? 0
+      : items.reduce((acc, item) => {
+          if (!item.tax) return acc;
+          const itemTotal = item.rate * item.qty;
+
+          if (tax.inclusive) {
+            const taxPart = itemTotal - (itemTotal / (1 + TAX_RATE)); // extract tax from inclusive price
+            return acc + taxPart;
+          } else {
+            return acc + itemTotal * TAX_RATE; // add tax on top
+          }
+        }, 0);
   
     // For now discount not implemented in calculation since type none
     const discountAmount =
@@ -283,7 +321,7 @@ function InvoiceForm() {
       ? discountValue
       : 0;
   
-    const total = subtotal + taxAmount - discountAmount;
+    const total = tax.inclusive ? subtotal : subtotal + taxAmount - discountAmount;
   
   
     // Handlers for UI
@@ -310,40 +348,56 @@ function InvoiceForm() {
       <>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Header />
         <Container maxWidth="lg" sx={{ mb: 5 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6">Invoice Builder</Typography>
-            <FormControlLabel
-              control={<Switch checked={darkMode} onChange={() => setDarkMode((prev) => !prev)} />}
-              label="Dark Mode"
-            />
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5} mt={2.5}>
+              <Typography variant="h6"> <strong>Invoice Builder</strong></Typography>
+              <FormControlLabel
+                control={<Switch checked={darkMode} onChange={() => setDarkMode((prev) => !prev)} />}
+                label="Dark Mode"
+              />
             </Box>
-          <Paper elevation={3} sx={{ p: 3, marginTop: 7, border: '1px solid transparent', boxShadow: 7 }}>
-              {/* Responsive Tabs */}
-              <Tabs
-                value={tab}
-                onChange={handleTabChange}
-                variant="scrollable"
-                scrollButtons="auto"
-                allowScrollButtonsMobile
-                sx={{ mb: 3 }}
-              >
-                <Tab label="Preview" />
-                <Tab label="Edit" />
-                <Tab label="Payment scheduling" />
-                <Tab label="PDF" />
-                <Tab label="Email Invoice" />
-              </Tabs>
-    
-              {/* Invoice Form Grid */}
-              <Box
+          <Box display='flex' sx={{ pt: 1, mt: 1, border: '1px solid transparent', boxShadow: 7, borderRadius: 3, justifyContent: 'space-evenly', width: '67%'}}>
+            <Tabs 
+                  value={tab}
+                  onChange={handleTabChange}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  allowScrollButtonsMobile
+                  sx={{ mb: 2, }}
+                  
+                >
+                  <Tab label="Preview" />
+                  <Tab label="Edit" />
+                  <Tab label="Payment scheduling" />
+                  <Tab label="Email Invoice" />
+                </Tabs>
+          </Box>
+          
+          {tab === 0 ? (
+              <PreviewPage
+                from={from}
+                billTo={billTo}
+                invoiceInfo={invoiceInfo}
+                items={items}
+                subtotal={subtotal}
+                taxAmount={taxAmount}
+                discountAmount={discountAmount}
+                total={total}
+                currency={currency}
+                logoImage={logoImage}
+                signatureImage={signatureImage}
+                notes={notes}
+              />
+        ) : (
+          <Box
                 display="flex"
                 flexDirection={{ xs: "column", md: "row" }}
                 gap={3}
-               >
+           >
+            <Paper elevation={3} sx={{ p: 3, flex: 2, marginTop: 4, border: '1px solid transparent', boxShadow: 7 }}>
+    
                 {/* Left Main Form */}
-                <Box flex={2} sx={{ minWidth: 0 }}>
+                <Box sx={{ minWidth: 0 }}>
                   <Paper variant="outlined" sx={{ p: 2,    mb: 3 }}>
                     <Box
                       sx={{
@@ -360,58 +414,90 @@ function InvoiceForm() {
                         Invoice
                       </Typography>
                       {!logoImage ? (
-                        <Button
-                          component="label"
-                          variant="outlined"
-                          startIcon={<Add />}
-                          sx={{
-                            border: '1px dashed #999',
-                            borderRadius: 2,
-                            px: 4,
-                            py: 1,
-                            fontSize: '0.875rem',
-                            color: 'text.secondary',
-                          }}
-                        >
-                          + Logo
-                          <input
-                            id="logo-input"
-                            hidden
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleLogoUpload(e, setLogoImage)}
-                          />
-                        </Button>
-                      ) : (
-                        <>
-                          <Button
-                            onClick={handleLogoClick}
-                            sx={{ p: 0, border: '1px solid #ccc', borderRadius: 2 }}
+                        <Tooltip title="Add Your Logo" arrow>
+                          <Button 
+                            component="label"
+                            variant="outlined"
+                            startIcon={<Add />}
+                            sx={{
+                              border: '1px dashed #999',
+                              borderRadius: 2,
+                              px: 7,
+                              py: 5,
+                              fontSize: '0.875rem',
+                              color: 'text.secondary',
+                            }}
                           >
+                            + Logo
+                            <input
+                              id="logo-input"
+                              hidden
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleLogoUpload(e, setLogoImage)}
+                            />
+                          </Button>
+                        </Tooltip>
+                      ) : (
+                          <Box position="relative" display="inline-block" sx={{ '&:hover .logo-overlay': { opacity: 1 } }}>
                             <img
                               src={logoImage}
                               alt="Logo"
-                              style={{ maxHeight: 200, maxWidth: '100%', borderRadius: 8 }}
+                              style={{
+                                maxHeight: 200,
+                                maxWidth: '100%',
+                                borderRadius: 8,
+                                border: '1px solid #ccc',
+                              }}
                             />
-                          </Button>
-                          <Menu
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                          >
-                            <MenuItem onClick={handleUpdateLogo}>Update Logo</MenuItem>
-                            <MenuItem onClick={handleDeleteLogo}>Delete Logo</MenuItem>
-                          </Menu>
-                          <input
-                            id="logo-input"
-                            hidden
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleLogoUpload(e, setLogoImage)}
-                          />
-                        </>
+                            {/* Hover Overlay */}
+                            <Box
+                              className="logo-overlay"
+                              sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                borderRadius: 2,
+                                bgcolor: 'rgba(0, 0, 0, 0.4)',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                                px: 1,
+                                pt: 1,
+                                opacity: 0,
+                                transition: 'opacity 0.3s',
+                              }}
+                            >
+                              {/* Update Button */}
+                              <Button
+                                size="small"
+                                variant="contained"
+                                color="primary"
+                                onClick={() => document.getElementById('logo-input')?.click()}
+                              >
+                                Update
+                              </Button>
+
+                              {/* Delete Icon */}
+                              <IconButton
+                                size="small"
+                                sx={{ color: '#fff' }}
+                                onClick={handleDeleteLogo}
+                              >
+                                <Close />
+                              </IconButton>
+                            </Box>
+
+                            <input
+                              id="logo-input"
+                              hidden
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleLogoUpload(e, setLogoImage)}
+                            />
+                          </Box>
                       )}
                     </Box>
 
@@ -487,107 +573,7 @@ function InvoiceForm() {
                         </Grid>
                       </Grid>
 
-                      <InvoiceTable />
-      
-                      {/* Table Headers */}
-                      {/* <Grid container sx={{ borderBottom: "1px solid #ccc", pb: 1, justifyContent: "space-evenly" }}>
-                        <Grid item xs={5} sx={{ fontWeight: "bold" }}>
-                          DESCRIPTION
-                        </Grid>
-                        <Grid item xs={2} sx={{ fontWeight: "bold" }} textAlign="center">
-                          RATE
-                        </Grid>
-                        <Grid item xs={1} sx={{ fontWeight: "bold" }} textAlign="center">
-                          QTY
-                        </Grid>
-                        <Grid item xs={2} sx={{ fontWeight: "bold" }} textAlign="right">
-                          AMOUNT
-                        </Grid>
-                        <Grid item xs={1} sx={{ fontWeight: "bold" }} textAlign="center">
-                          TAX
-                        </Grid>
-                        <Grid item xs={1} />
-                      </Grid> */}
-      
-                      {/* Invoice items rows */}
-                      {/* {items.map((item, index) => (
-                        <Grid
-                          container
-                          spacing={1}
-                          key={index}
-                          alignItems="center"
-                          sx={{ borderBottom: "1px solid #eee", py: 1 }}
-                        >
-                          <Grid item xs={5}>
-                            <TextField
-                              fullWidth
-                              variant="standard"
-                              placeholder="Item Description"
-                              value={item.description}
-                              onChange={handleItemChange(index, "description")}
-                            />
-                            <TextField
-                              fullWidth
-                              variant="standard"
-                              placeholder="Additional details"
-                              multiline
-                              minRows={1}
-                              maxRows={3}
-                              value={item.additionalDetails}
-                              onChange={handleItemChange(index, "additionalDetails")}
-                              sx={{ mt: 0.5 }}
-                            />
-                          </Grid>
-                          <Grid item xs={2}>
-                            <TextField
-                              type="number"
-                              variant="standard"
-                              inputProps={{ min: 0, step: "0.01" }}
-                              value={item.rate}
-                              onChange={handleItemChange(index, "rate")}
-                              InputProps={{
-                                startAdornment: <InputAdornment position="start">{currencySymbol}</InputAdornment>,
-                              }}
-                            />
-                          </Grid>
-                          <Grid item xs={1}>
-                            <TextField
-                              type="number"
-                              variant="standard"
-                              inputProps={{ min: 1, step: "1" }}
-                              value={item.qty}
-                              onChange={handleItemChange(index, "qty")}
-                            />
-                          </Grid>
-                          <Grid item xs={2} textAlign="right" sx={{ pt: 1 }}>
-                            {currencySymbol}
-                            {(item.rate * item.qty).toFixed(2)}
-                          </Grid>
-                          <Grid item xs={1} textAlign="center">
-                            <Checkbox
-                              checked={item.tax}
-                              onChange={handleItemChange(index, "tax")}
-                              inputProps={{ "aria-label": "Tax included for this item" }}
-                            />
-                          </Grid>
-                          <Grid item xs={1} textAlign="center">
-                            <IconButton
-                              aria-label="Remove item"
-                              size="small"
-                              onClick={() => handleRemoveItem(index)}
-                              disabled={items.length === 1}
-                            >
-                              <Remove fontSize="small" />
-                            </IconButton>
-                          </Grid>
-                        </Grid>
-                      ))} */}
-      
-                      {/* <Box mt={1}>
-                        <Button startIcon={<Add />} onClick={handleAddItem}>
-                          Add Item
-                        </Button>
-                      </Box>*/}
+                      <InvoiceTable items={items} setItems={setItems} currency={currencySymbol}/>
                       
                       {/* Totals */}
                       <Box mt={3} sx={{ textAlign: "right", pr: 2 }}>
@@ -596,8 +582,7 @@ function InvoiceForm() {
                           {subtotal.toFixed(2)}
                         </Typography>
                         <Typography>
-                          Tax: {currencySymbol}
-                          {taxAmount.toFixed(2)}
+                          Tax ({tax.inclusive ? "included" : "additional"}): {currencySymbol}{taxAmount.toFixed(2)}
                         </Typography>
                         <Divider sx={{ my: 1 }} />
                         <Typography variant="h6">
@@ -643,15 +628,6 @@ function InvoiceForm() {
                           />
                         </Button>
 
-                        <Button component="label" variant="outlined" startIcon={<Add />}>
-                          Add Photo
-                          <input
-                            hidden
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, setPhotoImage)}
-                          />
-                        </Button>
                       </Box>
 
                       {showSignaturePad && (
@@ -684,30 +660,22 @@ function InvoiceForm() {
                         </Box>
                       )}
 
-                      {photoImage && (
-                        <Box mt={2}>
-                          <Typography variant="subtitle2">Photo:</Typography>
-                          <img src={photoImage} alt="Photo" style={{ maxHeight: 100, border: '1px solid #ddd', borderRadius: 4 }} />
-                        </Box>
-                      )}
-                  </Paper>
-
-    
-                  {/* Bottom Buttons */}
-                  <Box display="flex" justifyContent="space-evenly" mt={2}>
-                      <Button variant="outlined" color="primary" onClick={handleCloseInvoice}>
-                          Close Invoice
-                      </Button>
-                      <Button variant="outlined" color="error" onClick={handleDeleteInvoice}>
-                          Delete Invoice
-                      </Button>
-                  </Box>
-                </Box>
+                    {/* Bottom Buttons */}
+                    <Box display="flex" justifyContent="space-evenly" mt={2}>
+                        <Button variant="outlined" color="primary" onClick={handleCloseInvoice}>
+                            Close Invoice
+                        </Button>
+                        <Button variant="outlined" color="error" onClick={handleDeleteInvoice}>
+                            Delete Invoice
+                        </Button>
+                    </Box>
+                </Paper>
+              </Box>
+            </Paper>
               
 
-    
                 {/* Right Sidebar */}
-                <Box flex={1} sx={{ minWidth: 0 }}>
+                <Box flex={1} sx={{ minWidth: 300, mt: 4, border: '1px solid transparent', boxShadow: 7, borderRadius: 1, maxHeight: 920 }}>
                   <Paper variant="outlined" sx={{ p: 3 }}>
                     {/* Preview via Email */}
                     <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: "bold" }}>
@@ -766,7 +734,7 @@ function InvoiceForm() {
                     <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: "bold" }}>
                       TAX
                     </Typography>
-                    <FormControl fullWidth size="small" sx={{ mb: 1 }}>
+                    <FormControl fullWidth size="small" sx={{ mb: 2 }}>
                       <InputLabel id="tax-type-label">Type</InputLabel>
                       <Select
                         labelId="tax-type-label"
@@ -860,7 +828,8 @@ function InvoiceForm() {
                     </Typography>
                     <Button
                       variant="contained"
-                      sx={{ mb: 1, width: '250px' }}
+                      fullWidth
+                      sx={{ mb: 1 }}
                       onClick={() => {
                         const fakeLink = `${window.location.origin}/invoice/INV0001`;
                         navigator.clipboard.writeText(fakeLink);
@@ -873,8 +842,8 @@ function InvoiceForm() {
 
                     <Button
                       variant="outlined"
-                      sx={{ width: '250px' }}
-                      onClick={() => window.print()}
+                      fullWidth
+                      onClick={handleDownload}
                     >
                       Print Invoice
                     </Button>
@@ -882,7 +851,7 @@ function InvoiceForm() {
                 </Paper>
               </Box>
             </Box>
-            </Paper>
+            )}
           </Container>
     
           {/* Snackbar for notifications */}

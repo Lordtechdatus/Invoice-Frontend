@@ -8,7 +8,7 @@ import InvoiceForm from "./components/InvoiceForm";
 import About from "./components/About";
 import LogIn from "./components/LogIn";
 import SignUp from "./components/SignUp";
-<<<<<<< HEAD
+import Pricing from "./components/Pricing";
 import { useLocation } from "react-router-dom";
 
 function ScrollControlStyles() {
@@ -30,16 +30,13 @@ function ScrollControlStyles() {
     />
   );
 }
-=======
-import Pricing from "./components/Pricing";
 
 const theme = createTheme();
->>>>>>> 5638628 (update the pricing page)
 
 function App() {
 
   return (
-<<<<<<< HEAD
+    <ThemeProvider theme={theme}>
       <Router>
         <CssBaseline />
         <ScrollControlStyles />
@@ -48,24 +45,12 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/create-invoice" element={<InvoiceForm />} />
           <Route path="/About" element={<About />} />
+          <Route path="/Pricing" element={<Pricing />} />
           <Route path="/Login" element={<LogIn />} />
           <Route path="/SignUp" element={<SignUp />} />
         </Routes>
       </Router>
-=======
-    <ThemeProvider theme={theme}>
-    <Router>
-      <Header />
-      <Routes>
-        <Route path="/create-invoice" element={<InvoiceForm />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/login" element={<LogIn />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/pricing" element={<Pricing />} />
-      </Routes>
-    </Router>
     </ThemeProvider>
->>>>>>> 5638628 (update the pricing page)
   );
 }
 

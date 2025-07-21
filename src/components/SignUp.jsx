@@ -24,7 +24,8 @@ const SignUp = () => {
         sx={{
           width: "70%",
           p: 4,
-          mt: 5,
+          mt: 1,
+          mb: 10,
           border: '0.5px solid transparent',
           borderRadius: 3,
           boxShadow: 8,
@@ -94,7 +95,7 @@ const SignUp = () => {
           </Button>
 
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Already have an account?<Button onClick={() => navigate("/SignIn")} color="blue" variant="text"
+            Already have an account?<Button onClick={() => navigate("/Login")} color="blue" variant="text"
             sx={{ textTransform: "none", color: "blue" }}>Log In</Button>
             </Typography>
         </Box>

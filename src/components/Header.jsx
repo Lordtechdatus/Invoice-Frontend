@@ -29,6 +29,7 @@ const navLinks = [
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
   { label: 'Login / Sign Up', href: '/login' },
+  { label: 'Upgrade Now', href: '/pricing'}
 ];
 
 function Header() {
@@ -83,7 +84,7 @@ function Header() {
   );
 
   return (
-    <AppBar position="fixed" sx={{ background: 'rgba(255,255,255,0.98)', color: 'primary.main', boxShadow: 2, mb: '70px' }}>
+    <AppBar position="static" sx={{ background: 'rgba(255,255,255,0.98)', color: 'primary.main', boxShadow: 2, borderBottom: '1px solid lightgray', height: 75 }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* Logo */}
         <Box display="flex" alignItems="center" gap={1} sx={{ cursor: 'pointer' }} onClick={() => navigate('/') }>

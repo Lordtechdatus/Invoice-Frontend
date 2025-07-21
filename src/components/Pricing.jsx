@@ -7,14 +7,14 @@ import StarIcon from '@mui/icons-material/Star';
 
 const plans = {
   monthly: [
-    { name: "Starter", price: "$0", period: "/mo", features: ["1 Invoice Template", "Basic Support", "Download as PDF", "Watermark on Invoice"], button: "Get Started", highlight: false },
-    { name: "Pro", price: "$12", period: "/mo", features: ["Unlimited Invoices", "Custom Branding", "Priority Support", "No Watermark", "Export to Excel"], button: "Upgrade Now", highlight: true },
-    { name: "Business", price: "$29", period: "/mo", features: ["All Pro Features", "Multi-user Access", "Advanced Reports", "API Access", "Dedicated Support"], button: "Contact Sales", highlight: false }
+    { name: "Starter", price: "₹0", period: "/mo", features: ["1 Invoice Template", "Basic Support", "Download as PDF", "Watermark on Invoice"], button: "Get Started", highlight: false },
+    { name: "Pro", price: "₹120", period: "/mo", features: ["Unlimited Invoices", "Custom Branding", "Priority Support", "No Watermark", "Export to Excel"], button: "Upgrade Now", highlight: true },
+    { name: "Business", price: "₹299", period: "/mo", features: ["All Pro Features", "Multi-user Access", "Advanced Reports", "API Access", "Dedicated Support"], button: "Contact Sales", highlight: false }
   ],
   yearly: [
     { name: "Starter", price: "$0", period: "/yr", features: ["1 Invoice Template", "Basic Support", "Download as PDF", "Watermark on Invoice"], button: "Get Started", highlight: false },
-    { name: "Pro", price: "$115", period: "/yr", features: ["Unlimited Invoices", "Custom Branding", "Priority Support", "No Watermark", "Export to Excel", "Save 20% vs monthly!"], button: "Upgrade Now", highlight: true },
-    { name: "Business", price: "$275", period: "/yr", features: ["All Pro Features", "Multi-user Access", "Advanced Reports", "API Access", "Dedicated Support", "Save 20% vs monthly!"], button: "Contact Sales", highlight: false }
+    { name: "Pro", price: "₹1152", period: "/yr", features: ["Unlimited Invoices", "Custom Branding", "Priority Support", "No Watermark", "Export to Excel", "Save 20% vs monthly!"], button: "Upgrade Now", highlight: true },
+    { name: "Business", price: "₹2870", period: "/yr", features: ["All Pro Features", "Multi-user Access", "Advanced Reports", "API Access", "Dedicated Support", "Save 20% vs monthly!"], button: "Contact Sales", highlight: false }
   ]
 };
 

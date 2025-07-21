@@ -15,16 +15,20 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 
-const InvoiceTable = () => {
-  const [items, setItems] = useState([
-    { description: "", details: "", rate: 0, qty: 1 },
-  ]);
-
-  const currency = "₹";
+const InvoiceTable = ({items, setItems, currency}) => {
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
-    newItems[index][field] = field === "rate" || field === "qty" ? parseFloat(value) : value;
+    if (field === "qty") {
+      let qty = parseInt(value);
+      if (isNaN(qty)) qty = 1;
+      qty = Math.max(1, Math.min(99, qty)); // Clamp between 1 and 99
+      newItems[index][field] = qty;
+    } else if (field === "rate") {
+      newItems[index][field] = parseFloat(value) || 0;
+    } else {
+      newItems[index][field] = value;
+    }
     setItems(newItems);
   };
 
@@ -107,12 +111,10 @@ const InvoiceTable = () => {
                 <TextField
                   type="number"
                   value={item.qty}
-                  onChange={(e) =>
-                    handleItemChange(index, "qty", e.target.value)
-                  }
+                  onChange={(e) => handleItemChange(index, "qty", e.target.value)}
                   size="small"
                   margin="dense"
-                  inputProps={{ min: 1 }}
+                  inputProps={{ min: 1, max: 99 }}
                 />
               </TableCell>
               <TableCell>

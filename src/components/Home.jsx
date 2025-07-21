@@ -8,7 +8,7 @@ export default function Home() {
       <Box
         sx={{
           textAlign: 'center',
-          mt: 15,
+          mt: 6,
         }}
       >
         <Typography variant="h2" fontWeight="bold" gutterBottom sx={{background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)', color: 'transparent', WebkitBackgroundClip: 'text'}}>
@@ -28,7 +28,7 @@ export default function Home() {
           >
             Create Invoice
           </Button>
-          <Button
+          {/* <Button
             variant="outlined"
             size="large"
             startIcon={<ReceiptLong />}
@@ -36,7 +36,7 @@ export default function Home() {
             sx = {{borderRadius: 3}}
           >
             View Invoices
-          </Button>
+          </Button> */}
         </Stack>
 
         {/* Optional Features Section */}
