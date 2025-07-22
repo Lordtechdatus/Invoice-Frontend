@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Box,
   Paper,
@@ -19,7 +20,7 @@ const plans = {
   monthly: [
     {
       name: "Starter",
-      price: "$0",
+      price: "₹0",
       period: "/mo",
       features: [
         "1 Invoice Template",
@@ -32,7 +33,7 @@ const plans = {
     },
     {
       name: "Pro",
-      price: "$12",
+      price: "₹199",
       period: "/mo",
       features: [
         "Unlimited Invoices",
@@ -46,7 +47,7 @@ const plans = {
     },
     {
       name: "Business",
-      price: "$29",
+      price: "₹299",
       period: "/mo",
       features: [
         "All Pro Features",
@@ -62,7 +63,7 @@ const plans = {
   yearly: [
     {
       name: "Starter",
-      price: "$0",
+      price: "₹0",
       period: "/yr",
       features: [
         "1 Invoice Template",
@@ -75,7 +76,7 @@ const plans = {
     },
     {
       name: "Pro",
-      price: "$115",
+      price: "₹1900",
       period: "/yr",
       features: [
         "Unlimited Invoices",
@@ -90,7 +91,7 @@ const plans = {
     },
     {
       name: "Business",
-      price: "$275",
+      price: "₹2870",
       period: "/yr",
       features: [
         "All Pro Features",
@@ -143,7 +144,7 @@ const AnimatedPaper = styled(Paper, {
   padding: theme.spacing(4, 3),
   boxShadow: highlight
     ? "0 8px 32px 0 rgba(33,150,243,0.25)"
-    : theme.shadow[2],
+    : theme.shadows[2],
   border: highlight ? `2px solid ${theme.palette.primary.main}` : "none",
   background: highlight
     ? "linear-gradient(135deg, #e3f2fd 0%, #fff 100%)"

@@ -23,13 +23,12 @@ import lordtechLogo from '../assets/lordtech.png';
 
 const navLinks = [
   { label: 'Home', href: '/' },
-  { label: 'Create Invoice', href: '/create-invoice' },
+  { label: 'Invoices', href: '/invoices' },
   { label: 'Features', href: '/features' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
   { label: 'Login / Sign Up', href: '/login' },
-  { label: 'Upgrade Now', href: '/pricing'}
 ];
 
 function Header() {

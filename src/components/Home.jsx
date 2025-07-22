@@ -28,7 +28,7 @@ export default function Home() {
           >
             Create Invoice
           </Button>
-          {/* <Button
+          <Button
             variant="outlined"
             size="large"
             startIcon={<ReceiptLong />}
@@ -36,7 +36,7 @@ export default function Home() {
             sx = {{borderRadius: 3}}
           >
             View Invoices
-          </Button> */}
+          </Button>
         </Stack>
 
         {/* Optional Features Section */}

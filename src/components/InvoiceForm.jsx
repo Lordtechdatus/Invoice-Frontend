@@ -37,6 +37,7 @@ import "./index.css";
 import InvoiceTable from "./Table";
 import PreviewPage from "./Preview";
 import { useNavigate } from 'react-router-dom';
+import { useInvoiceContext } from './InvoiceContext';
 
 const currencyList = [
   { code: "INR", symbol: "₹", label: "Indian Rupee", flag: "🇮🇳" },
@@ -61,6 +62,7 @@ const colorThemes = [
 
 function InvoiceForm() {
     const navigate = useNavigate();
+    const { addInvoice } = useInvoiceContext();
     const sigPadRef = useRef(null);
     const [tab, setTab] = useState(1);
     const [showSignaturePad, setShowSignaturePad] = useState(false);
@@ -96,10 +98,16 @@ function InvoiceForm() {
       mobile: "",
       fax: "",
     });
+
+    // const generateNextInvoiceNumber = (current) => {
+    //   const prefix = current.match(/^[^\d]+/)[0];
+    //   const number = parseInt(current.replace(/^[^\d]+/, '')) + 1;
+    //   return `${prefix}${number.toString().padStart(5, '0')}`;
+    // };
   
     // Invoice info
     const [invoiceInfo, setInvoiceInfo] = useState({
-      number: "INV0001",
+      number: "INV00001",
       date: new Date().toLocaleDateString('en-GB'), 
       terms: "On Receipt",
     });
@@ -168,6 +176,33 @@ function InvoiceForm() {
 
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${invoiceInfo.number || "invoice"}.pdf`);
+    };
+
+    const handleSaveInvoice = () => {
+      const newInvoice = {
+        id: invoiceInfo.number,
+        client: billTo.name,
+        date: invoiceInfo.date,
+        balanceDue: parseFloat(total.toFixed(2)),
+        status: parseFloat(total) === 0 ? 'paid' : 'outstanding',
+        from,
+        billTo,
+        invoiceInfo,
+        items,
+        subtotal,
+        taxAmount,
+        discountAmount,
+        total,
+        currency,
+        logoImage,
+        signatureImage,
+        notes
+      };
+      addInvoice(newInvoice);
+      // const nextNumber = generateNextInvoiceNumber(invoiceInfo.number);
+      // setInvoiceInfo((prev) => ({ ...prev, number: nextNumber }));
+      setSnackbar({ open: true, message: `Invoice ${invoiceInfo.number} saved.`, severity: "success" });
+      navigate("/invoices");
     };
   
     // Handlers for basic inputs
@@ -349,14 +384,14 @@ function InvoiceForm() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Container maxWidth="lg" sx={{ mb: 5 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5} mt={2.5}>
+          {/* <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5} mt={2.5}>
               <Typography variant="h6"> <strong>Invoice Builder</strong></Typography>
               <FormControlLabel
                 control={<Switch checked={darkMode} onChange={() => setDarkMode((prev) => !prev)} />}
                 label="Dark Mode"
               />
-            </Box>
-          <Box display='flex' sx={{ pt: 1, mt: 1, border: '1px solid transparent', boxShadow: 7, borderRadius: 3, justifyContent: 'space-evenly', width: '67%'}}>
+            </Box> */}
+          <Box display='flex' sx={{ pt: 1, mt: 4, border: '1px solid transparent', boxShadow: 7, borderRadius: 3, justifyContent: 'space-evenly', width: '67%'}}>
             <Tabs 
                   value={tab}
                   onChange={handleTabChange}
@@ -826,7 +861,10 @@ function InvoiceForm() {
                     <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: "bold" }}>
                       OPTIONS
                     </Typography>
-                    <Button
+                    <Button variant="contained" fullWidth color="primary" sx={{ mb: 1 }} onClick={handleSaveInvoice}>Save Invoice</Button>
+                    <Button variant="outlined" fullWidth onClick={handleDownload}>Download PDF</Button>
+
+                    {/* <Button
                       variant="contained"
                       fullWidth
                       sx={{ mb: 1 }}
@@ -846,7 +884,7 @@ function InvoiceForm() {
                       onClick={handleDownload}
                     >
                       Print Invoice
-                    </Button>
+                    </Button> */}
 
                 </Paper>
               </Box>
