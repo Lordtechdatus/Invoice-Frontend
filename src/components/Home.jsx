@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, Typography, Button, Container, Stack, Paper } from '@mui/material';
 import { AddCircleOutline, ReceiptLong } from '@mui/icons-material';
+import Footer from './Footer';
 
 export default function Home() {
   return (
+    <>
     <Container maxWidth="md">
       <Box
         sx={{
@@ -32,10 +34,10 @@ export default function Home() {
             variant="outlined"
             size="large"
             startIcon={<ReceiptLong />}
-            href="/invoices"
+            href="/salary"
             sx = {{borderRadius: 3}}
           >
-            View Invoices
+            Create Salary Slip
           </Button>
         </Stack>
 
@@ -73,5 +75,7 @@ export default function Home() {
         </Box>
       </Box>
     </Container>
+    <Footer />
+    </>
   );
 }
