@@ -26,7 +26,7 @@ import {
       justifyContent='space-evenly'
         sx={{
           backgroundColor: '#fff',
-          borderTop: '1px solid #eee',
+          borderTop: '1px solid lightgray',
           py: 4,
           px: { xs: 2, md: 10 },
           mt: 10,
@@ -65,12 +65,12 @@ import {
           <Grid item xs={6} md={2}>
             <Typography fontWeight="bold" mb={1}>Product</Typography>
             <Stack spacing={0.5}>
-              <Link style={{textDecoration: 'none'}} href="#">Online Invoice Generator</Link>
+              <Link style={{textDecoration: 'none'}} href="/create-invoice">Online Invoice Generator</Link>
               <Link style={{textDecoration: 'none'}} href="#">Receipt Maker</Link>
               <Link style={{textDecoration: 'none'}} href="#">Estimate Maker</Link>
               <Link style={{textDecoration: 'none'}} href="#">Features</Link>
-              <Link style={{textDecoration: 'none'}} href="#">Pricing</Link>
-              <Link style={{textDecoration: 'none'}} href="#">Login ↗</Link>
+              <Link style={{textDecoration: 'none'}} href="/pricing">Pricing</Link>
+              <Link style={{textDecoration: 'none'}} href="/login">Login ↗</Link>
             </Stack>
           </Grid>
   
@@ -93,7 +93,7 @@ import {
               <Link style={{textDecoration: 'none'}} href="/about">About</Link>
               <Link style={{textDecoration: 'none'}} href="#">Customers</Link>
               <Link style={{textDecoration: 'none'}} href="/contact">Contact</Link>
-              <Link style={{textDecoration: 'none'}} href="/admin">Admin</Link>
+              <Link style={{textDecoration: 'none'}} href="/admin/login">Admin</Link>
             </Stack>
           </Grid>
   
@@ -118,8 +118,8 @@ import {
       </Box>
       {/* Bottom Copyright */}
       <Box mt={4} textAlign="center" fontSize="14px" color="text.secondary">
-          © {year} <strong>Invoice Simple</strong>. <Link href="#">Privacy Policy</Link> ·{' '}
-          <Link href="#">Terms of Service</Link>
+          © {year} <strong>Invoice Simple</strong>. <Link>Privacy Policy</Link> ·{' '}
+          <Link>Terms of Service</Link>  {/* TODO: Add Links to Privacy Policy and Terms of Services*/}
         </Box>
       </>
     );

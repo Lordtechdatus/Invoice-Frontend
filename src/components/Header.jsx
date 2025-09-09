@@ -10,7 +10,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  Divider,
   useMediaQuery,
   useTheme,
   Stack,
@@ -24,7 +23,7 @@ import lordtechLogo from '../assets/lordtech.png';
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Invoices', href: '/invoices' },
-  { label: 'Salary Slip', href: '/salary' },
+  { label: 'Salary Slips', href: '/salary-slips' },
   { label: 'Features', href: '/features' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'About', href: '/about' },
@@ -132,6 +131,7 @@ function Header() {
               <MenuItem onClick={handleFeaturesMenuClose}>Reports</MenuItem>
             </Menu>
             <Button
+              onClick={() => navigate('/pricing')}
               variant="contained"
               sx={{
                 background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)',

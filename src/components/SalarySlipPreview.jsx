@@ -31,6 +31,33 @@ const SalarySlipPreview = ({
 
   const formatCurrency = (val) => `₹${parseFloat(val).toFixed(2)}`;
 
+  function numberToWords(num) {
+    const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+    const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    const units = ["", "thousand", "million", "billion"];
+  
+    if (num === 0) return "zero";
+  
+    function convertBelowThousand(n) {
+      if (n < 20) return ones[n];
+      if (n < 100) {
+        return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? "-" + ones[n % 10] : "");
+      }
+      return ones[Math.floor(n / 100)] + " hundred" + (n % 100 !== 0 ? " and " + convertBelowThousand(n % 100) : "");
+    }
+  
+    let words = "";
+    let i = 0;
+    while (num > 0) {
+      if (num % 1000 !== 0) {
+        words = convertBelowThousand(num % 1000) + " " + units[i] + " " + words;
+      }
+      num = Math.floor(num / 1000);
+      i++;
+    }
+    return words.trim();
+  }
+
   return (
     <Box>
       <Box
@@ -40,26 +67,31 @@ const SalarySlipPreview = ({
         mx="auto"
         sx={{ backgroundColor: "#fff", color: "#000", mt: 3, border: "1px solid lightgray" }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={3}>
+        <Box display="flex" alignItems="flex-start" mb={1}>
           <Typography variant="h5" fontWeight="bold">Salary Slip</Typography>
-          {logoImage && <img src={logoImage} alt="Logo" style={{ height: 120 }} />}
+          {/* {logoImage && <img src={logoImage} alt="Logo" style={{ height: 120 }} />} */}
         </Box>
 
-        <Box mb={2}>
+        {logoImage && <img src={logoImage} alt="Logo" style={{ height: 160 }} />}
+
+        <Box mb={2} mt={2}>
           <Grid container spacing={35}>
             <Grid item xs={6}>
-              <Typography><strong>Employee Name:</strong> {employee.name}</Typography>
-              <Typography><strong>Employee ID:</strong> {employee.id}</Typography>
-              <Typography><strong>Designation:</strong> {employee.designation}</Typography>
-              <Typography><strong>Department:</strong> {employee.department}</Typography>
-              <Typography><strong>Location:</strong> {employee.location}</Typography>
+              <Typography><strong>Employee Name:</strong> {employee.Name}</Typography>
+              <Typography><strong>Employee ID:</strong> {employee.EmpId}</Typography>
+              <Typography><strong>Designation:</strong> {employee.Designation}</Typography>
+              <Typography><strong>Department:</strong> {employee.Department}</Typography>
+              <Typography><strong>Joining Date:</strong> {employee.JoiningDate}</Typography>
+              {/* <Typography><strong>Location:</strong> {employee}</Typography> */}
             </Grid>
             <Grid item xs={6}>
-              <Typography><strong>Slip No:</strong> {slipInfo.number}</Typography>
+              {/* <Typography><strong>Slip No:</strong> {slipInfo.number}</Typography> */}
               <Typography><strong>Issue Date:</strong> {slipInfo.issueDate}</Typography>
-              <Typography><strong>Pay Period:</strong> {slipInfo.payPeriod}</Typography>
-              <Typography><strong>Email:</strong> {employee.email}</Typography>
-              <Typography><strong>Joining Date:</strong> {employee.joiningDate}</Typography>
+              <Typography><strong>Pay Period:</strong> {employee.PayPeriod}</Typography>
+              <Typography><strong>Paid Days:</strong> {employee.PaidDays}</Typography>
+              <Typography><strong>LOP Days:</strong> {employee.LossOfPayDays}</Typography>
+              {/* <Typography><strong>Email:</strong> {employee.email}</Typography> */}
+              
             </Grid>
           </Grid>
         </Box>
@@ -110,6 +142,7 @@ const SalarySlipPreview = ({
           <Typography><strong>Gross Earnings:</strong> {formatCurrency(grossEarnings)}</Typography>
           <Typography><strong>Total Deductions:</strong> {formatCurrency(totalDeductions)}</Typography>
           <Typography variant="h6"><strong>Net Salary:</strong> {formatCurrency(netSalary)}</Typography>
+          <Typography><strong>Net Salary in words:</strong> {numberToWords(parseInt(netSalary)).charAt(0).toUpperCase() + numberToWords(parseInt(netSalary)).slice(1)} Rupees </Typography>
         </Box>
 
         {notes && (
@@ -127,7 +160,7 @@ const SalarySlipPreview = ({
         )}
       </Box>
 
-      <Box textAlign="right" mt={2}>
+      <Box textAlign="center" mt={2}>
         <Button variant="contained" sx={{ borderRadius: 2 }} onClick={handleDownload}>
           Download PDF
         </Button>

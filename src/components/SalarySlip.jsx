@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   CssBaseline,
   Button,
@@ -20,17 +21,47 @@ import {
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import SalarySlipPreview from "./SalarySlipPreview";
+import { useSalarySlipContext } from "./SalarySlipContext";
+
+function formatSlipNo(n) {
+  return `PAY${String(n).padStart(5, "0")}`;
+}
+
+function findMaxSlipNoFromSaved() {
+  try {
+    const raw = localStorage.getItem("salarySlips");
+    if (!raw) return 0;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return 0;
+    let maxNum = 0;
+    for (const item of arr) {
+      const candidate = item?.slipNo || item?.number || "";
+      const m = typeof candidate === "string" && candidate.match(/^PAY(\d{1,})$/);
+      if (m) {
+        const num = parseInt(m[1], 10);
+        if (!Number.isNaN(num)) maxNum = Math.max(maxNum, num);
+      }
+    }
+    return maxNum;
+  } catch {
+    return 0;
+  }
+}
 
 function SalarySlipForm() {
+  const navigate = useNavigate();
+  const { addSlip } = useSalarySlipContext();
   const [tab, setTab] = useState(1);
   const [employee, setEmployee] = useState({
-    name: "",
-    id: "",
-    email: "",
-    designation: "",
-    department: "",
-    joiningDate: "",
-    location: "",
+    Name: "",
+    EmpId: "",
+    Designation: "",
+    Department: "",
+    JoiningDate: "",
+    PayPeriod: "",
+    PaidDays: "",
+    LossOfPayDays: "",
+    PayDate: "",
   });
 
   const [slipInfo, setSlipInfo] = useState({
@@ -55,9 +86,30 @@ function SalarySlipForm() {
   const [signatureImage, setSignatureImage] = useState(null);
   const [signatureRole, setSignatureRole] = useState("Director");
 
-  const grossEarnings = earnings.reduce((acc, e) => acc + Number(e.amount), 0);
-  const totalDeductions = deductions.reduce((acc, d) => acc + Number(d.amount), 0);
+  const grossEarnings = earnings.reduce((acc, e) => acc + Number(e.amount || 0), 0);
+  const totalDeductions = deductions.reduce((acc, d) => acc + Number(d.amount || 0), 0);
   const netSalary = grossEarnings - totalDeductions;
+
+  useEffect(() => {
+    let nextNum = 1;
+    try {
+      const stored = localStorage.getItem("next_slip_no");
+      if (stored) {
+        const parsed = parseInt(stored, 10);
+        if (!Number.isNaN(parsed) && parsed >= 1) {
+          nextNum = parsed;
+        }
+      } else {
+        const maxFromSaved = findMaxSlipNoFromSaved();
+        nextNum = maxFromSaved > 0 ? maxFromSaved + 1 : 1;
+        localStorage.setItem("next_slip_no", String(nextNum));
+      }
+    } catch {
+      nextNum = 1;
+      localStorage.setItem("next_slip_no", "1");
+    }
+    setSlipInfo((prev) => ({ ...prev, number: formatSlipNo(nextNum) }));
+  }, []);
 
   const handleTabChange = (e, newVal) => setTab(newVal);
 
@@ -71,6 +123,59 @@ function SalarySlipForm() {
   };
 
   const handleRemoveImage = (setter) => setter(null);
+
+  const handleSaveSlip = () => {
+    try {
+      const slipToSave = {
+        slipNo: slipInfo.number,
+        issueDate: slipInfo.issueDate,
+        payPeriod: slipInfo.payPeriod,
+        employee,
+        earnings,
+        deductions,
+        grossEarnings,
+        totalDeductions,
+        netSalary,
+        notes,
+        logoImage,
+        signatureRole,
+        signatureImage,
+        createdAt: new Date().toISOString(),
+      };
+
+      const listRow = {
+        id: slipInfo.number,
+        employee: employee.Name || "-",
+        date: slipInfo.issueDate,
+        netPay: Number(netSalary) || 0,
+        status: "pending",
+      };
+      addSlip(listRow);
+      // addSlip(slipToSave);
+
+      const raw = localStorage.getItem("salarySlips");
+      const list = raw ? JSON.parse(raw) : [];
+      const idx = Array.isArray(list) ? list.findIndex((s) => (s.slipNo || s.number) === slipInfo.number) : -1;
+
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], ...slipToSave, updatedAt: new Date().toISOString() };
+      } else {
+        list.push(slipToSave);
+      }
+
+      localStorage.setItem("salarySlips", JSON.stringify(list));
+
+      const current = parseInt(localStorage.getItem("next_slip_no") || "1", 10);
+      const nextVal = Number.isNaN(current) ? 2 : current + 1;
+      localStorage.setItem("next_slip_no", String(nextVal));
+      setSlipInfo((prev) => ({ ...prev, number: formatSlipNo(nextVal) }));
+
+      setSnackbar({ open: true, message: "Slip saved successfully!", severity: "success" });
+      navigate("/salary-slips");
+    } catch {
+      setSnackbar({ open: true, message: "Failed to save slip.", severity: "error" });
+    }
+  };
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -238,9 +343,7 @@ function SalarySlipForm() {
                 <MenuItem value="Team Manager">Team Manager</MenuItem>
               </Select>
             </FormControl>
-            
             <br />
-
             {!signatureImage ? (
               <Button component="label" variant="outlined">
                 + Signature
@@ -257,6 +360,15 @@ function SalarySlipForm() {
               </Box>
             )}
           </Box>
+
+          <Box display="flex" gap={2} justifyContent="flex-end">
+            <Button variant="outlined" onClick={() => setTab(0)}>
+              Preview
+            </Button>
+            <Button variant="contained" onClick={handleSaveSlip}>
+              Save Slip
+            </Button>
+          </Box>
         </Paper>
       )}
 
@@ -272,4 +384,3 @@ function SalarySlipForm() {
 }
 
 export default SalarySlipForm;
-

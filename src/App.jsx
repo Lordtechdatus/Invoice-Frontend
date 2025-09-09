@@ -10,15 +10,16 @@ import About from "./components/About";
 import Pricing from "./components/Pricing";
 import LogIn from "./components/LogIn";
 import SignUp from "./components/SignUp";
-// import AdminLogin from './admin/AdminLogin';
+import AdminLogin from './admin/AdminLogin';
 import AdminDashboard from './admin/AdminDashboard';
-// import AdminUsers from './admin/AdminUsers';
-// import AdminInvoices from './admin/AdminInvoices';
+import AdminUsers from './admin/AdminUsers';
+import AdminInvoices from './admin/AdminInvoices';
 import AdminRoute from './admin/AdminRoute';
 import { useLocation } from "react-router-dom";
 import InvoicePage from "./components/Invoices";
 import AuthSuccess from "./components/AuthSuccess";
 import SalarySlipForm from "./components/SalarySlip";
+import SalarySlipPage from "./components/SalarySlipsPage";
 
 function ScrollControlStyles() {
   const location = useLocation();
@@ -54,6 +55,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/invoices" element={<InvoicePage />} />
           <Route path="/create-invoice" element={<InvoiceForm />} />
+          <Route path="/salary-slips" element={<SalarySlipPage />} />
           <Route path="/salary" element={<SalarySlipForm />} />
           <Route path="/preview" element={<PreviewPage />} />
           <Route path="/About" element={<About />} />
@@ -61,10 +63,10 @@ function App() {
           <Route path="/Login" element={<LogIn />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/auth-success" element={<AuthSuccess />} />
-          {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
-          {/* <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-          <Route path="/admin/invoices" element={<AdminRoute><AdminInvoices /></AdminRoute>} /> */}
+          <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+          <Route path="/admin/invoices" element={<AdminRoute><AdminInvoices /></AdminRoute>} />
         </Routes>
       </Router>
     </ThemeProvider>
